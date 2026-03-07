@@ -8,11 +8,24 @@ session_start();
         $password = $_POST['password'];
 
         if (!empty($username) && !empty($password) && !is_numeric($username)) {
-            $user_id = random_num(20);
-            $query = "insert into users (user_id, username, password) values ('$user_id', '$username', '$password')";
-            mysqli_query($con, $query);
-            header("Location: login.php");
-            die;
+            $stmt = mysqli_stmt_init($con);
+            $isAnyUserNameExists = "select * from users where username = ?";
+            mysqli_stmt_prepare($stmt, $isAnyUserNameExists);  
+            mysqli_stmt_bind_param($stmt, "s", $username);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            if ($result && mysqli_num_rows($result) > 0) {
+                $error = "Username already exists!";
+            } else {
+                $user_id = random_num(20);
+                $password = password_hash($password, PASSWORD_DEFAULT);
+                $query = "insert into users (user_id, username, password) values (?, ?, ?)";
+                $stmt = mysqli_prepare($con, $query);
+                mysqli_stmt_bind_param($stmt, "sss", $user_id, $username, $password);
+                mysqli_stmt_execute($stmt);
+                header("Location: login.php");
+                die;
+            }
         } else {
             $error = "Please enter some valid information!";
         }

@@ -9,14 +9,19 @@ session_start();
         $password = $_POST['password'];
 
         if (!empty($username) && !empty($password) && !is_numeric($username)) {
-            $query = "select * from users where username = '$username' and password = '$password' limit 1";
-            $result = mysqli_query($con, $query);
-            
+            $stmt = mysqli_stmt_init($con);
+            $query = "select * from users where username = ?";
+            mysqli_stmt_prepare($stmt, $query);
+            mysqli_stmt_bind_param($stmt, "s", $username);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
             if ($result && mysqli_num_rows($result) > 0) {
                 $user_data = mysqli_fetch_assoc($result);
-                $_SESSION['user_id'] = $user_data['user_id'];
-                header("Location: index.php");
-                die;
+                if (password_verify($password, $user_data['password'])) {
+                    $_SESSION['user_id'] = $user_data['user_id'];
+                    header("Location: index.php");
+                    die;
+                }
             }
             $error = "Wrong username or password!";
         } else {

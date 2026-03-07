@@ -12,7 +12,7 @@ session_start();
 <head>  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - My PHP App</title>
+    <title>Form Generator</title>
     <style>
         /* Modern ve temiz arka plan */
         body {
@@ -151,14 +151,13 @@ session_start();
         
         <hr>
 
-        <form method="post" action="save_data.php">
+        <form method="post" action="generate_form.php">
             <label for="user_input">Form Request</label>
             <input type="text" id="user_input" name="user_data_input" placeholder="Describe the form you want to create..." required>
             
             <input type="submit" value="Submit Request">
         </form>
 
-        <p class="footer-note">Logged in as: <?php echo $user_data['username']; ?></p>
     </div>
 
 </body>

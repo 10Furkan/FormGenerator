@@ -4,13 +4,13 @@ session_start();
 include("connection.php");
 include("function.php");
 
-// Kullanıcı giriş yapmış mı kontrol et
+// check login
 $user_data = check_login($con);
 
-// Varsayılan boş yapı
+// default response for the form page
 $response_php = [
-    'title' => 'Anket Bekleniyor',
-    'description' => 'Lütfen bir form oluşturmak için veri giriniz.',
+    'title' => 'Survey Awaiting',
+    'description' => 'Please enter data to create a form.',
     'fields' => []
 ];
 
@@ -19,31 +19,26 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['user_data_input'])) {
     $request_text = mysqli_real_escape_string($con, $_POST['user_data_input']);
 
     if (!empty($request_text)) {
-        // 1. Google Gemini'den ham cevabı al
+        
+        // 1.Get the answer from Google Gemini API
         $ai_response_raw = ai_response($request_text, $google_ai_key);
 
-        // 2. Önce Gemini'nin devasa dış API JSON'unu PHP dizisine çevir
+        // 2. Check the returned data
         $api_data = json_decode($ai_response_raw, true);
 
-        // 3. Formun ASIL metninin (text) yerinde olup olmadığını kontrol et
         if (isset($api_data['candidates'][0]['content']['parts'][0]['text'])) {
             
-            // Asıl form JSON metnini çıkarıyoruz
             $form_json_text = $api_data['candidates'][0]['content']['parts'][0]['text'];
-
-            // Başındaki ve sonundaki markdown (` ```json `) taglerini temizle
-            $clean_json = preg_replace('/^```json\s*|```\s*$/m', '', $form_json_text);
-            $clean_json = trim($clean_json);
-
-            // Şimdi bu asıl form metnini diziye çevir
+            
+            // Because Gemini uses the JSON MimeType, it usually comes clean, but just to be safe.:
+            $clean_json = trim($form_json_text);
             $decoded_data = json_decode($clean_json, true);
 
             if (json_last_error() === JSON_ERROR_NONE && is_array($decoded_data)) {
                 
-                // Yapay Zeka isimleri kafasına göre değiştirmiş olabilir, toparlayalım:
-                $form_fields = $decoded_data['fields'] ?? $decoded_data['questions'] ?? $decoded_data['sorular'] ?? [];
-                $form_title = $decoded_data['form_title'] ?? $decoded_data['title'] ?? 'İsimsiz Form';
-                $form_desc = $decoded_data['form_description'] ?? $decoded_data['description'] ?? '';
+                $form_fields = $decoded_data['fields'] ?? [];
+                $form_title = $decoded_data['title'] ?? 'Unnamed Form';
+                $form_desc = $decoded_data['description'] ?? '';
 
                 if (!empty($form_fields)) {
                     $response_php = [
@@ -53,18 +48,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['user_data_input'])) {
                     ];
                     $_SESSION['current_survey'] = $response_php;
                 } else {
-                    $response_php['title'] = 'Soru Bulunamadı';
-                    $response_php['description'] = 'Yapay zeka formu oluşturdu ama içine soru eklemedi.';
+                    $response_php['title'] = 'Question Not Found';
+                    $response_php['description'] = 'The AI generated a form but didn\'t include any questions.';
                 }
             } else {
-                $response_php['title'] = 'JSON Ayrıştırma Hatası';
-                $response_php['description'] = 'İç metin bozuk: ' . json_last_error_msg();
+                $response_php['title'] = 'JSON Parsing Error';
+                $response_php['description'] = 'Internal text is corrupted: ' . json_last_error_msg();
             }
         } else {
-            $response_php['title'] = 'Bağlantı Hatası';
-            $response_php['description'] = 'Google Gemini API beklenmedik bir yapı döndürdü.';
-            //echo "<pre>API Cevabı:\n" . htmlspecialchars($ai_response_raw) . "</pre>"; // Hata ayıklama için ham cevabı göster
-            echo "<pre>Retry Delay : " . htmlspecialchars($api_data['error']['details'][2]['retryDelay'] ?? 'Yok') . "</pre>"; // Hata ayıklama için retryDelay'ı göster
+            $response_php['title'] = 'Connection Error';
+            $response_php['description'] = 'Google Gemini API returned an unexpected structure.';
         }
     }
 } 
@@ -85,9 +78,8 @@ elseif (isset($_SESSION['current_survey']) && is_array($_SESSION['current_survey
         p.desc { color: #7f8c8d; margin-bottom: 25px; line-height: 1.6; }
         .form-group { margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
         label { display: block; font-weight: 600; margin-bottom: 10px; color: #34495e;}
-        .radio-option { display: block; margin-bottom: 8px; cursor: pointer; }
-        .radio-inline { display: inline-block; margin-right: 15px; cursor: pointer; }
-        input[type="number"], input[type="email"], textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-family:inherit;}
+        .radio-option { display: block; margin-bottom: 8px; cursor: pointer; font-weight: 400;}
+        textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-family:inherit;}
         button { background: #27ae60; color: white; padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; font-weight:bold;}
         button:hover { background: #219150; }
         .empty-state { text-align: center; color: #888; margin-top: 30px; padding: 20px; background: #f9f9f9; border-radius: 8px;}
@@ -102,85 +94,41 @@ elseif (isset($_SESSION['current_survey']) && is_array($_SESSION['current_survey
     <?php if (!empty($response_php['fields'])): ?>
         <form action="save.php" method="POST">
             <?php foreach ($response_php['fields'] as $field): 
-                // Yapay Zeka bazen name, bazen id kullanır. İkisini de destekleyelim.
-                $input_name = htmlspecialchars($field['name'] ?? $field['id'] ?? 'isimsiz_alan');
+                $input_name = htmlspecialchars($field['name'] ?? 'unnamed_field');
             ?>
                 <div class="form-group">
                     <label>
-                        <?php echo htmlspecialchars($field['label'] ?? 'Soru'); ?> 
-                        <?php echo (!empty($field['required']) ? '<span style="color:red">*</span>' : ''); ?>
+                        <?php echo htmlspecialchars($field['label'] ?? 'Question'); ?> 
+                        <span style="color:red">*</span>
                     </label>
                     
                     <?php 
-                    /* --- RADIO veya RATING TİPİ KONTROLÜ --- */
-                    if (isset($field['type']) && ($field['type'] === 'radio' || $field['type'] === 'rating')): 
+                    /* --- ONLY RADIO AND TEXTAREA CONTROL --- */
+                    if (isset($field['type']) && $field['type'] === 'radio'): 
                         
-                        // 1. Senaryo: Eski usül 'options' dizisi geldiyse
                         if (isset($field['options']) && is_array($field['options'])):
                             foreach ($field['options'] as $option): ?>
                                 <label class="radio-option">
-                                    <input type="radio" name="<?php echo $input_name; ?>" value="<?php echo htmlspecialchars($option['value'] ?? ''); ?>" <?php echo (!empty($field['required']) ? 'required' : ''); ?>>
-                                    <?php echo htmlspecialchars($option['text'] ?? ''); ?>
+                                    <input type="radio" name="<?php echo $input_name; ?>" value="<?php echo htmlspecialchars($option); ?>" required>
+                                    <?php echo htmlspecialchars($option); ?>
                                 </label>
                             <?php endforeach;
-                        
-                        // 2. Senaryo: Senin çıktındaki gibi 'labels' objesi geldiyse (1: Kötü, 5: İyi gibi)
-                        elseif (isset($field['labels']) && is_array($field['labels'])):
-                            foreach ($field['labels'] as $val => $text): ?>
-                                <label class="radio-option">
-                                    <input type="radio" name="<?php echo $input_name; ?>" value="<?php echo htmlspecialchars($val); ?>" <?php echo (!empty($field['required']) ? 'required' : ''); ?>>
-                                    <strong><?php echo htmlspecialchars($val); ?>:</strong> <?php echo htmlspecialchars($text); ?>
-                                </label>
-                            <?php endforeach;
-                            
-                        // 3. Senaryo: Sadece min-max verdiyse (1, 2, 3, 4, 5 gibi yanyana dizelim)
-                        elseif (isset($field['min']) && isset($field['max'])):
-                            for ($i = $field['min']; $i <= $field['max']; $i++): ?>
-                                <label class="radio-inline">
-                                    <input type="radio" name="<?php echo $input_name; ?>" value="<?php echo $i; ?>" <?php echo (!empty($field['required']) ? 'required' : ''); ?>>
-                                    <?php echo $i; ?>
-                                </label>
-                            <?php endfor;
                         endif;
 
-                    /* --- NUMBER TİPİ KONTROLÜ --- */
-                    elseif (isset($field['type']) && $field['type'] === 'number'): ?>
-                        <input type="number" 
-                               name="<?php echo $input_name; ?>" 
-                               min="<?php echo htmlspecialchars($field['min'] ?? ''); ?>" 
-                               max="<?php echo htmlspecialchars($field['max'] ?? ''); ?>" 
-                               placeholder="<?php echo htmlspecialchars($field['placeholder'] ?? ''); ?>"
-                               <?php echo (!empty($field['required']) ? 'required' : ''); ?>>
-
-                    /* --- EMAIL TİPİ KONTROLÜ (Yapay zeka bunu da üretmiş) --- */
-                    elseif (isset($field['type']) && $field['type'] === 'email'): ?>
-                        <input type="email" 
-                               name="<?php echo $input_name; ?>" 
-                               placeholder="<?php echo htmlspecialchars($field['placeholder'] ?? ''); ?>"
-                               <?php echo (!empty($field['required']) ? 'required' : ''); ?>>
-
-                    /* --- TEXTAREA TİPİ KONTROLÜ --- */
                     elseif (isset($field['type']) && $field['type'] === 'textarea'): ?>
                         <textarea name="<?php echo $input_name; ?>" 
                                   rows="4" 
-                                  placeholder="<?php echo htmlspecialchars($field['placeholder'] ?? ''); ?>"
-                                  <?php echo (!empty($field['required']) ? 'required' : ''); ?>></textarea>
-                    
-                    /* --- DEFAULT TEXT INPUT KONTROLÜ --- */
-                    else: ?>
-                        <input type="text" 
-                               name="<?php echo $input_name; ?>" 
-                               placeholder="<?php echo htmlspecialchars($field['placeholder'] ?? ''); ?>"
-                               <?php echo (!empty($field['required']) ? 'required' : ''); ?>>
+                                  placeholder="Enter your feedback here..."
+                                  required></textarea>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
 
-            <button type="submit"><?php echo htmlspecialchars($response_php['submit_button_text'] ?? 'Gönder'); ?></button>
+            <button type="submit">Send</button>
         </form>
     <?php else: ?>
         <div class="empty-state">
-            Henüz görüntülenecek bir anket alanı yok. Lütfen bir form oluşturun.
+            There is no survey area to display yet. Please create a form.
         </div>
     <?php endif; ?>
 </div>

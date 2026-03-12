@@ -1,0 +1,24 @@
+name: Deploy to InfinityFree via FTP
+
+on:
+  push:
+    branches:
+      - main  # Hangi branch'e push attığında çalışmasını istiyorsan (genelde main)
+
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v3
+
+    - name: 📂 Sync files
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        # InfinityFree'de dosyalar genellikle htdocs içine atılır
+        server-dir: ./htdocs/ 
+        # local-dir: ./ (Eğer dosyaların bir klasör içindeyse burayı düzenleyebilirsin)

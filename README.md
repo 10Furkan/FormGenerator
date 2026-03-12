@@ -26,6 +26,6 @@ If you want to run the project locally on your computer, follow these steps:
    git clone [https://github.com/10Furkan/FormGenerator.git](https://github.com/10Furkan/FormGenerator.git)
    ```
 2. Move the project files to the `htdocs` or `www` folder of a local PHP server environment like XAMPP, WAMP, or MAMP.
-3. Configure the database settings (Create the necessary MySQL tables and enter your credentials in the relevant connection file, such as `function.php`).
+3. Create your database and import the database.sql file from the main directory.
 4. Add your API Key required for the AI integration to the corresponding PHP file.
 5. Open your browser and go to `http://localhost/FormGenerator` to start the project.

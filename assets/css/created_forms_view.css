@@ -149,3 +149,18 @@ td a:hover {
     transform: translateY(-1px);
     /* Çok hafif yukarı zıplama efekti */
 }
+
+.title-link {
+    color: #1f2937;
+    /* Koyu gri/siyah, normal metin rengi */
+    text-decoration: none;
+    /* Alt çizgiyi kaldırır */
+    font-weight: 600;
+    /* Biraz kalın yapar */
+    transition: all 0.2s ease;
+
+}
+
+.title-link:hover {
+    text-decoration: underline;
+}

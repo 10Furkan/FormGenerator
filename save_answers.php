@@ -16,11 +16,20 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         
         // Convert the answers array to JSON string to save in the database
         $answers_json = json_encode($answers, JSON_UNESCAPED_UNICODE);
-        
+
+
+        $query_survey = "SELECT * FROM surveys WHERE id = ?";
+        $stmt_survey = mysqli_prepare($con, $query_survey);
+        mysqli_stmt_bind_param($stmt_survey, "i", $survey_id);
+        mysqli_stmt_execute($stmt_survey);
+        $result_survey = mysqli_stmt_get_result($stmt_survey);
+        $survey = mysqli_fetch_assoc($result_survey);
+        $user_id = $survey['user_id'];
+
         // Insert the data into the survey_responses table
-        $query = "INSERT INTO survey_responses (survey_id, answers_data) VALUES (?, ?)";
+        $query = "INSERT INTO survey_responses (user_id,survey_id, answers_data) VALUES (?, ?, ?)";
         $stmt = mysqli_prepare($con, $query);
-        mysqli_stmt_bind_param($stmt, "is", $survey_id, $answers_json);
+        mysqli_stmt_bind_param($stmt, "iis", $user_id, $survey_id, $answers_json);
         
         if (mysqli_stmt_execute($stmt)) {
             $status_message = "Thank you! Your answers have been successfully submitted.";

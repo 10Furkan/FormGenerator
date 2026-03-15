@@ -87,6 +87,10 @@ elseif (isset($_SESSION['current_survey']) && is_array($_SESSION['current_survey
     </style>
 </head>
 <body>
+    <div class="navbar">
+        <a href="index.php" class="home-btn">Home</a> 
+        <a href="logout.php" class="logout-btn">Logout</a>
+    </div>
 
 <div class="top-bar">
     <div>

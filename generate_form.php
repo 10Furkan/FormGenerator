@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['user_data_input'])) {
     $request_text = mysqli_real_escape_string($con, $_POST['user_data_input']);
 
     if (!empty($request_text)) {
-        $ai_response_raw = ai_response($request_text, $google_ai_key);
+        $ai_response_raw = ai_response($request_text, $api_key);
         $api_data = json_decode($ai_response_raw, true);
 
         if (isset($api_data['candidates'][0]['content']['parts'][0]['text'])) {

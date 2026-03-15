@@ -1,8 +1,8 @@
 <?php
 session_start();
 
-    include("connection.php");
-    include("function.php");
+    include_once("connection.php");
+    include_once("function.php");
 
     if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $username = $_POST['username'];

@@ -11,30 +11,57 @@ body {
 }
 
 /* Üst Menü / Navbar stili */
+/* Beyaz üst şeridi kapsayan div */
 .navbar {
-    width: 100%;
-    background-color: #ffffff;
-    padding: 15px 0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    position: fixed;
+    position: absolute;
     top: 0;
-    text-align: center;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    /* Birini sola, diğerini sağa yaslar */
+    align-items: center;
+    padding: 15px 40px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    /* Şeridin altına hafif şık bir gölge */
+    box-sizing: border-box;
 }
 
-.logout-btn {
+/* Yeni Butonun Stili */
+.btn-history {
     text-decoration: none;
-    color: #e74c3c;
-    font-weight: bold;
+    color: #6366f1;
+    font-weight: 600;
     font-size: 14px;
-    border: 1px solid #e74c3c;
-    padding: 8px 20px;
-    border-radius: 20px;
-    transition: all 0.3s;
+    padding: 8px 16px;
+    border: 1px solid #6366f1;
+    border-radius: 8px;
+    transition: all 0.3s ease;
 }
 
-.logout-btn:hover {
-    background-color: #e74c3c;
+.btn-history:hover {
+    background-color: #6366f1;
     color: white;
+}
+
+/* Logout Butonunun Stili (Zaten varsa sadece rengini kontrol et) */
+.btn-logout {
+    padding: 8px 25px;
+    color: #ff4d4d;
+    background-color: transparent;
+    border: 1px solid #ff4d4d;
+    border-radius: 20px;
+    /* Kenarları oval yapar */
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    background-color: #ff4d4d;
+    color: #ffffff;
 }
 
 /* Ana Kart (Container) */

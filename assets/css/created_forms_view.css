@@ -1,0 +1,151 @@
+/* Genel Ayarlar */
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+    /* Ana sitedeki ferah arka plan rengi */
+    color: #333;
+}
+
+/* Üst Menü (Navbar) - Ana sayfadaki beyaz şerit stili */
+.navbar {
+    background-color: #ffffff;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    /* Hafif alt gölge */
+    border-bottom: 1px solid #eee;
+}
+
+/* Menü Linkleri Stili */
+.navbar a {
+    text-decoration: none;
+    color: #6366f1;
+    /* Mor tema rengimiz */
+    font-weight: 600;
+    font-size: 14px;
+    margin-right: 20px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+/* Home Butonu Özel Stili */
+.navbar a.home-btn {
+    padding: 8px 24px;
+    color: #6366f1;
+    background-color: #ffffff;
+    border: 2px solid #6366f1;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.navbar a.home-btn:hover {
+    background-color: #6366f1;
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+}
+
+.navbar a:hover {
+    background-color: #f3f4f6;
+}
+
+/* Kırmızı Logout Butonu Stili (Opsiyonel ama önerilir) */
+.navbar a.logout-btn {
+    color: #ff4d4d;
+    border: 1px solid #ff4d4d;
+    border-radius: 20px;
+    margin-left: auto;
+    /* Logout'u en sağa atar */
+}
+
+.navbar a.logout-btn:hover {
+    background-color: #ff4d4d;
+    color: #ffffff;
+}
+
+/* Ana İçerik Kutusu - Oval köşeler ve yumuşak gölge */
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 16px;
+    /* Ana sayfadaki oval yapı */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+h1 {
+    color: #1f2937;
+    font-size: 28px;
+    margin-top: 0;
+    margin-bottom: 30px;
+    text-align: center;
+    font-weight: 700;
+}
+
+/* Modern Tablo Tasarımı */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th,
+td {
+    padding: 16px 12px;
+    text-align: left;
+    border-bottom: 1px solid #f3f4f6;
+    /* Çok hafif, zarif bir çizgi */
+}
+
+th {
+    background-color: #ffffff;
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e5e7eb;
+    /* Başlıkları içerikten ayırmak için biraz daha koyu */
+}
+
+/* Tablo Satırı Vurgusu */
+tr {
+    transition: background-color 0.2s ease;
+}
+
+tr:hover {
+    background-color: #f9fafb;
+    /* Fareyle üzerine gelince satır hafif belirginleşir */
+}
+
+/* Tablodaki 'View Form' Linkleri */
+td a {
+    display: inline-block;
+    /* Padding ve boyutların düzgün çalışmasını sağlar */
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 8px 16px;
+    background-color: #f0f0ff;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    /* Metnin alt alta kaymasını kesin olarak engeller */
+    text-align: center;
+}
+
+td a:hover {
+    background-color: #6366f1;
+    /* Üzerine gelince tamamen mor olsun */
+    color: #ffffff;
+    /* Yazı beyaz olsun */
+    transform: translateY(-1px);
+    /* Çok hafif yukarı zıplama efekti */
+}

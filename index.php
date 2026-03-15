@@ -19,9 +19,9 @@ session_start();
 </head>
 
 <body>
-    <div class="navbar">
-        <a href="logout.php" class="logout-btn">Logout</a>
-    </div>
+    <header class="navbar"> <a href="created_forms.php" class="btn-history">View Created Forms</a>
+        <a href="logout.php" class="btn-logout">Logout</a>
+    </header>
 
     <div class="container">
         <h1>Welcome Back!</h1>
@@ -37,6 +37,7 @@ session_start();
         </form>
 
     </div>
+
 
 </body>
 </html>
